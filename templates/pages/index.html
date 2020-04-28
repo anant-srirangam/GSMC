@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load static %}
+
+{% block title %}
+| Welcome
+{% endblock %}
+
+
+{% block content %}
+
+    <!-- Alerts -->
+    {% include 'partials/_alerts.html' %}
+    <!-- Showcase -->
+    <section id="showcase">
+        <div class="container text-center">
+        <div class="home-search p-5">
+            <div class="overlay p-5">
+            <h1 class="display-4 mb-4">
+                Job Searching Just Got So Easy
+            </h1>
+            <div class="search">
+                <form action="{% url 'searchListing' %}">
+                <!-- Form Row 1 -->
+                <div class="form-row">
+                    <div class="col-md-4 mb-3">
+                    <label class="sr-only">Keywords</label>
+                    <input type="text" name="keywords" class="form-control" placeholder="Keyword (Job title, Job Desc..)">
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                    <label class="sr-only">Company</label>
+                    <select name="company" class="form-control">
+                        <option selected="true" disabled="disabled">Company (All)</option>
+                        {% for stateKey,stateValue in state_choices.items %}
+                            <option value="{{stateKey}}">{{stateValue}}</option>
+                        {% endfor %}
+                    </select>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="sr-only">Job Title</label>
+                        <select name="job_title" class="form-control">
+                            <option selected="true" disabled="disabled">Job Title (All)</option>
+                            {% for stateKey,stateValue in state_choices.items %}
+                                <option value="{{stateKey}}">{{stateValue}}</option>
+                            {% endfor %}
+                        </select>
+                        </div>
+                </div>
+                <button class="btn btn-secondary btn-block mt-4" type="submit">Search</button>
+                </form>
+            </div>
+            </div>
+        </div>
+        </div>
+    </section>
+
+    <!-- Listings -->
+    <section id="listings" class="py-5">
+        <div class="container">
+			<!-- <h3 class="text-center mb-3">Latest Listings</h3> -->
+			<div class="row">
+                {% if listings %}
+                    {% for listing in listings %}
+                        <div class="col-md-6 col-lg-6 mb-4">
+                            <div class="card listing-preview">
+                                <div class="card-body">
+                                    <div class="row py-2">
+                                            <div class="col-3">
+                                                <img class="icon" src="" alt="company_logo">
+                                            </div>
+                                            <div class="col-9 listing-heading text-center">
+                                                <h5 class="text-primary">134256789098765432345678987654ew3456</h5>
+                                                <p>
+                                                    <i class="fas fa-building text-secondary">Testing</i>
+                                                </p>
+                                            </div>
+                                    </div>
+                                    <hr>
+                                    <div class="row py-2 text-secondary">
+                                        <div class="col-6">
+                                        <i class="fas fa-th-large"></i> Experience: asd</div>
+                                        <div class="col-6">
+                                        <i class="fas fa-money-bill"></i> Salary: asdasd</div>
+                                    </div>
+                                    <div class="row text-secondary">
+                                        <div class="col-6">
+                                            <i class="fas fa-map-marker "></i> city, state
+
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="row  text-secondary pb-2">
+                                        <div class="col-6">
+                                        <i class="fas fa-user"></i> posted_by (designation)</div>
+                                    </div>
+                                    <div class="row text-secondary pb-2">
+                                        <div class="col-6">
+                                        <i class="fas fa-clock"></i> date </div>
+                                    </div>
+                                    <hr>
+                                    <a href="{% url 'listing' listing.id %}" class="btn btn-primary btn-block">More Info</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-md-12">
+                        <p>No Listings Available</p>
+                    </div>
+                {% endif %}	
+            </div>
+                <div class="row">
+                    <div class="col-md-12">
+                      {% if listings.has_other_pages %}
+                        <ul id="pages" class="pagination justify-content-center" max-size="2">
+                          {% if listings.has_previous %}
+                            <li class="page-item">
+                              <a href="?page={{listings.previous_page_number}}" class="page-link">
+                                &laquo;
+                              </a>
+                            </li>
+                          {% endif %}
+                          {% for pg in listings.paginator.page_range%}
+                            {% if listings.number == pg %}
+                              <li class="page-item active">
+                                <a class="page-link">
+                                  {{pg}}
+                                </a>
+                              </li>
+                            {% else %}
+                              <li class="page-item">
+                                <a href="?page={{pg}}" class="page-link">
+                                  {{pg}}
+                                </a>
+                              </li>
+                            {% endif %}
+                          {% endfor %}
+                          {% if listings.has_next %}
+                            <li class="page-item">
+                              <a href="?page={{listings.next_page_number}}" class="page-link">
+                                &raquo;
+                              </a>
+                            </li>
+                          {% endif %}
+                        </ul>
+                      {% endif %}
+                    </div>
+                  </div>
+            
+		</div>
+        
+    </section>
+    
+    
+{% endblock %}

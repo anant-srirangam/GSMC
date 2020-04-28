@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block title %}
+| About
+{% endblock %}
+
+
+{% block content %}
+    
+  <section id="showcase-inner" class="py-5 text-white">
+    <div class="container">
+      <div class="row text-center">
+        <div class="col-md-12">
+          <h1 class="display-4">About Us</h1>
+          <p class="lead"><i>Together we define the change we envision</i></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Breadcrumb -->
+  <section id="bc" class="mt-3">
+    <div class="container">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="{% url 'index' %}">
+              <i class="fas fa-home"></i> Home</a>
+          </li>
+          <li class="breadcrumb-item active"> About</li>
+        </ol>
+      </nav>
+    </div>
+  </section>
+
+  <section id="about" class="py-4">
+    <div class="container">
+		<div class="row">
+			<div class="col-md-8">
+			  <h2>We Bring The Right Candidate For Your Requirement</h2>
+			  <img src="{% static 'img/about.jpg' %}" alt="">
+			  <p class="mt-4" text-align="justify" text-justify= "inter-word">With tons of students graduating every year and many more experienced professionals switching companies every now and then,
+				we understand how tough it gets for a recruiter to pick up the right candidate and how frustrating it becomes for a candidate to land an apt job.
+				But, don't worry <i><strong>Here We Are !!!</strong></i>
+			  </p>
+			  <p class="mt-4"  text-align="justify" text-justify= "inter-word">
+				We at Geetsai Manpower Consultancy know just how to pull you out from the never ending pile of work. Our team not only brings a list of jobs for
+				professionals/to-be-professionals out there but also takes up the task of going through each and every resume we recieve and filters them out as per 
+				the company's requirement. Yes! there is no software to pull out keywords from resume because as it turns out many good candidates miss an opportunity
+				just because of the format of their resume does not align with software's algorithm and we do not want that. Our experts ensure that each incoming resume is manually read for initial screening and then and only then is forwarded to the recruiter.
+			  </p>
+			  <p class="mt-4" text-align="justify" text-justify= "inter-word">
+				You might wonder <i>"What about those who do not check our website ??"</i>. Well, do not worry, we have a team which is focused on grabbing the 
+				right candidate for you from all the major job-listing portals, hence, you can just sit back and relax once you share your burden with us......
+			  </p>
+			  <p class="mt-4" text-align="justify" text-justify= "inter-word"> 
+				So, what are you waiting for, come join our network :)
+			  </p>
+			</div>
+			<div class="col-md-4">
+				{% for realtor in mvpRealtors%}
+				  <div class="card">
+					<img class="card-img-top" src="{{realtor.photo.url}}" alt="Seller of the month">
+					<div class="card-body">
+					  <h5 class="card-title">CEO</h5>
+					  <h6 class="text-secondary">Geetanjali Bulsu</h6>
+					  <p class="card-text">{{realtor.description}}
+					  </p>
+					</div>
+				  </div>
+				{% endfor %}
+				<button class="btn-primary btn-block btn-lg" data-toggle="modal" data-target="#inquiryModal">Make An Inquiry</button>
+			</div>
+		</div>
+	</div>
+  </section>
+  
+  <!-- Inquiry Modal -->
+				<div class="modal fade" id="inquiryModal" role="dialog">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="inquiryModalLabel">Make An Inquiry</h5>
+								<button type="button" class="close" data-dismiss="modal">
+								  <span>&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<form action="{% url 'contact' %}" method="POST">
+									  {% csrf_token %}
+									  {% if user.is_authenticated %}
+										  <input type="hidden" name="user_id" value="{{user.id}}">
+									  {% else %}
+										  <input type="hidden" name="user_id" value="0">
+									  {% endif %}
+									  <input type="hidden" name="realtor_email" value="{{ listing.realtor.email }}">
+									  <input type="hidden" name="listing_id" value="{{ listing.id }}">
+									  <div class="form-group">
+										  <label for="property_name" class="col-form-label">Property:</label>
+										  <input type="text" name="listing" class="form-control" value="{{listing.title}}"
+										  readonly>
+									  </div>
+									  <div class="form-group">
+										  <label for="name" class="col-form-label">Name:</label>
+										  <input type="text" name="name" class="form-control" 
+										  {% if user.is_authenticated %}
+											  value="{{user.first_name}} {{user.last_name}}"
+										  {% endif %}
+										  required>
+									  </div>
+									  <div class="form-group">
+										  <label for="email" class="col-form-label">Email:</label>
+										  <input type="email" name="email" class="form-control" 
+										  {% if user.is_authenticated %}
+											  value={{user.email}}
+										  {% endif %}
+										  required>
+									  </div>
+									  <div class="form-group">
+										  <label for="phone" class="col-form-label">Phone:</label>
+										  <input type="text" name="phone" class="form-control">
+									  </div>
+									  <div class="form-group">
+										  <label for="message" class="col-form-label">Message:</label>
+										  <textarea name="message" class="form-control"></textarea>
+									  </div>
+									  <hr>
+									  <input type="submit" value="Send" class="btn btn-block btn-secondary">
+								</form>
+							</div>
+						</div>
+					  
+					</div>
+				</div> 
+		
+
+  <!-- Work -->
+  <section id="work" class="bg-dark text-white text-center">
+    <h2 class="display-4">We Work For You</h2>
+    <hr>
+    <a href="{% url 'index' %}" class="btn btn-secondary text-white btn-lg">View Our Featured Listings</a>
+  </section>
+
+{% endblock %}
