@@ -26,8 +26,8 @@
                 class="nav-item mr-3"
             {% endif %}
             >
-              <a class="nav-link" href="{% url 'dashboard' %}">
-                {{user.first_name}} (Dashboard)</a>
+              <a class="nav-link">
+                {{user.first_name}} {{user.last_name}}</a>
             </li>
           {% else %}
               <li 
@@ -53,13 +53,24 @@
         
         <ul class="navbar-nav ml-auto">
           {% if user.is_authenticated %}
+            {% if user.username != 'admin' %}
+            <li 
+              {% if 'profile' in request.path %}
+                  class="nav-item active mr-3"
+              {% else %}
+                  class="nav-item mr-3"
+              {% endif %}
+              >
+              <a class="nav-link" href="{% url 'profile' %}"><i class="fas fa-user"></i>
+                My Profile</a>
+            </li>
+            {% endif %}
             <li class="nav-item mr-3">
               <a href="javascript:{document.getElementById('logout').submit()}" class="nav-link">
                 <i class="fas fa-sign-out-alt"></i> Logout</a>
-              <form action="{% url 'logout' %}" id="logout" method="POST">
-                {% csrf_token %}
-                <input type="hidden" name="">
-              </form>
+                <form action="{% url 'logout' %}" id="logout" method="POST">
+                  {% csrf_token %}
+                </form>
             </li>
           {% else %}
             <li 

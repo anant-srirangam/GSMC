@@ -21,7 +21,8 @@
                             <!-- Alerts -->
                             {% include 'partials/_alerts.html' %}
 							<form action="{% url 'login' %}" method="POST">
-                                {% csrf_token %}
+								{% csrf_token %}
+								<input type="hidden" name="loginType" value="employer" readonly required>
                                 <div class="form-group">
 									<label for="username">Username</label>
 									<input type="text" name="username" class="form-control" required>
@@ -35,10 +36,55 @@
 								<input type="submit" value="Login" class="btn btn-secondary btn-block">
 							</form>
 						</div>
+						<div class="row justify-content-center">
+							<a href="" style="font-size: xx-small; font-style:italic; color:darkcyan" data-toggle="modal" data-target="#inquiryModal">
+								Forgot Password ?</a>
+						</div>
+						<div class="row">
+							<hr>
+						</div>
 					</div>
 				</div>
 			</div>
         </div>
     </section>
+
+  <!-- Inquiry Modal -->
+  <div class="modal fade" id="inquiryModal" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="inquiryModalLabel">Confirm Your Email</h5>
+				<button type="button" class="close" data-dismiss="modal">
+				  <span>&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				
+				<div class="row">
+					<div class="col-md-12">
+						<p class="text-secondary"><em>A password re-set link will be sent to your registered email address</em></p>
+					</div>
+					
+				</div>
+				<div class="row">
+
+				</div>
+				<form action="{% url 'forgotPassword' %}" method="POST">
+					  {% csrf_token %}
+					  <div class="form-group">
+						  <label for="email" class="col-form-label">Email:</label>
+						  <input type="email" name="email" class="form-control" required>
+					  </div>
+					  
+					  <hr>
+					  <input type="submit" value="Confirm" class="btn btn-block btn-secondary">
+				</form>
+			</div>
+		</div>
+	  
+	</div>
+</div> 
+
 
 {% endblock %}

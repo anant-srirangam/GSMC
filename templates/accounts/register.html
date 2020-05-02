@@ -20,7 +20,7 @@
 						<div class="card-body">
                             <!-- Alerts -->
                             {% include 'partials/_alerts.html' %}
-							<form action="{% url 'register' %}" method="POST">
+							<form action="{% url 'register' %}" method="POST"  enctype="multipart/form-data">
                                 {% csrf_token %}
                                 <div class="form-group">
 									<label for="first_name">First Name</label>
@@ -31,12 +31,12 @@
 									<input type="text" name="last_name" class="form-control" required>
 								</div>
 								<div class="form-group">
-									<label for="username">Username</label>
-									<input type="text" name="username" class="form-control" required>
+									<label for="email">Work Email<em> (will be used as username)</em></label>
+									<input type="email" name="email" class="form-control" required>
 								</div>
 								<div class="form-group">
-									<label for="email">Email</label>
-									<input type="email" name="email" class="form-control" required>
+									<label for="phone">Phone</label>
+									<input type="phone" name="phone" class="form-control" required>
 								</div>
 								<div class="form-group">
 									<label for="password2">Password</label>
@@ -45,6 +45,30 @@
 								<div class="form-group">
 									<label for="password">Confirm Password</label>
 									<input type="password" name="password2" class="form-control" required>
+								</div>
+								<div class="form-group">
+									<label for="companyName">Company Name</label>
+									<input type="text" name="companyName" class="form-control" required>
+								</div>
+								<div class="form-group">
+									<label for="companyUrl">Company URL</label>
+									<input type="text" name="companyUrl" class="form-control" required>
+								</div>
+								<div class="form-group">
+									<label for="designation">Designation</label>
+									<input type="text" name="designation" class="form-control" required>
+								</div>
+								<div class="form-group">
+									<label for="location">Company Location</label>
+									<input type="text" name="location" class="form-control" required>
+								</div>
+								<div class="form-group">
+									<label for="companyLogo">Company Logo (<=100 KB)</label>
+									<input name="companyLogo" class="form-control" type="file" accept="image/*" required>
+								</div>
+								<div class="form-group">
+									<label for="profileImage">Profile Image (<=500 KB)</label>
+									<input type="file" name="profileImage" class="form-control"  accept="image/*" required>
 								</div>
 								<input type="submit" value="Register" class="btn btn-secondary btn-block">
 							</form>

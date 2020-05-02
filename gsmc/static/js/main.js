@@ -7,9 +7,16 @@ setTimeout(function(){
 }, 3000);
 
 
-$('#pages').twbsPagination({
-    visiblePages: 2,
-    onPageClick: function (event, page) {
-        $('#page-content').text(page);
-    }
-});
+function showForm(){
+    document.getElementById("changeProfileForm").removeAttribute("hidden");
+    document.getElementById("changeImage").setAttribute("hidden","true");
+    document.getElementById("deactivate").setAttribute("hidden","true");
+}
+
+
+function hideForm(){
+    document.getElementById("changeProfileForm").setAttribute("hidden","true");
+    document.getElementById("changeImage").removeAttribute("hidden");
+    document.getElementById("deactivate").removeAttribute("hidden");
+}
+

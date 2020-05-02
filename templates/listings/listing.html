@@ -41,7 +41,11 @@
         <!-- Listing -->
         <section id="listing" class="py-4">
             <div class="container">
-            <a href="{% url 'listings' %}" class="btn btn-light mb-4">Back To Listings</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard' %}" class="btn btn-light mb-4">Back To Dashboard</a>
+                {% else %}
+                    <a href="{% url 'listings' %}" class="btn btn-light mb-4">Back To Listings</a>
+                {% endif %}
             <div class="row">
                 <div class="col-md-9">
                 <!-- Home Main Image -->

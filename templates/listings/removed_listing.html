@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load static %}
+
+
+{% block title %}
+| {{listing.title}}
+{% endblock %}
+
+
+{% block content %}
+        {% include 'partials/_alerts.html' %}
+
+        <section id="showcase-inner" class="py-5 text-white">
+            <div class="container">
+            <div class="row text-center">
+                <div class="col-md-12">
+                <h1 class="display-4">{{listing.jobTitle}}</h1>
+                <p class="lead">
+                    <i class="fas fa-map-marker"></i> {{listing.location}}</p>
+                </div>
+            </div>
+            </div>
+        </section>
+        <!-- Breadcrumb -->
+        <section id="bc" class="mt-3">
+            <div class="container">
+            <nav>
+                <ol class="breadcrumb">
+                    {% if user.is_authenticated %}
+                        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                        <li class="breadcrumb-item">
+                            <a href="{% url 'dashboardRemoved' %}">Removed Listings</a>
+                        </li>
+                        <li class="breadcrumb-item active">{{listing.gmcsJobId}}</li>
+                    {% else %}
+                        <li class="breadcrumb-item"><a href="{% url 'index' %}"><i class="fa fa-home"></i> Home</a></li>
+                        <li class="breadcrumb-item active">{{listing.gmcsJobId}}</li>
+                    {% endif %}
+                    
+                </ol>
+            </nav>
+            </div>
+        </section>
+
+        <!-- Listing -->
+        <section id="listing" class="py-4">
+            <div class="container">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'dashboardRemoved' %}" class="btn btn-light mb-4">Back To Dashboard</a>
+                {% else %}
+                    <a href="{% url 'listings' %}" class="btn btn-light mb-4">Back To Listings</a>
+                {% endif %}
+                
+                <div class="row">
+                    <div class="col-md-9">
+                        <hr>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-9 margin-right-10">
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <h2 class="job-title">{{listing.jobTitle}}</h2>
+                                    <p>{{listing.jobId}}</p>
+                                    <p class="fas 1lt2x text-secondary"><i class="fas fa-map-marker"></i> <em>{{listing.location}}</em></p>
+                                </div>
+                                <div class="col-md-2">
+                                    <img src="{{listing.employer.profile.companyLogo.url}}" alt="Company Logo">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <hr>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <label for="Eperience" class="col-form-label fas" style="font-size:large"><em>Experience : </em> 
+                                    </label>
+                                </div>
+                                <div class="col-md-10">
+                                    <label for="Eperience" class="col-form-label fas" style="font-size:large">{{listing.minExp}} to {{listing.maxExp}} Years
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <label for="Salary" class="col-form-label fas" style="font-size:large">
+                                        <em>Salary (<i class="fa fa-rupee-sign" style="font-size: small;"></i>) :</em> 
+                                         
+                                    </label>
+                                </div>
+                                <div class="col-md-7">
+                                    <label class="col-form-label fas" style="font-size:large">{{listing.salary|intcomma}} </label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <hr>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <label for="JobDescription" class="col-form-label fas" style="font-size:large"><em>Job Description :</em> 
+                                    </label>
+                                </div>
+                                <div class="col-md-10">
+                                    <p for="JobDescription" class="col-form-label fas 1lt2x" style="text-align:justify">
+                                        {{listing.jobDesc}}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <hr>
+                            </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card mb-3">
+                            <img class="card-img-top" src="{{listing.employer.profile.profileImage.url}}" alt="Recruiter">
+                            <div class="card-body">
+                                <h5 class="card-title">{{listing.employer.first_name}} {{listing.employer.last_name}}</h5>
+                                <h6 class="text-secondary">{{listing.employer.profile.designation}}</h6>
+                                <h6 class="text-secondary"><i class="fa fa-clock"></i> {{listing.list_date}} {{listing.list_date|naturaltime}}</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    
+        
+{% endblock %}

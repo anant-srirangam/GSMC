@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+| {{user.first_name}}
+{% endblock %}
+
+
+{% block content %}
+    <section id="showcase-dashboard" class="py-5 text-white">
+        <div class="container">
+        <div class="row text-center">
+            <div class="col-md-12">
+            <h1 class="display-4">Admin Dashboard</h1>
+            <p class="lead">Manage your actions here</p>
+            </div>
+        </div>
+        </div>
+    </section>
+
+    <!-- Breadcrumb -->
+    <section id="bc" class="mt-3">
+        <div class="row">
+            <div class="container col-md-7 no-right-margin" >
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item "> Dashboard</li>
+                        <li class="breadcrumb-item active">
+                            {% if requestType == 'pending'%}
+                                Pending Requests
+                            {% elif requestType == 'approved' %}
+                                Approved Requests
+                            {% else %}
+                                Rejected Requests
+                            {% endif %}
+                        </li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="container col-md-4 no-left-margin">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        {% if requestType == 'pending'%}
+                            <li class="breadcrumb-item"></li>
+                                <a href="{% url 'adminApproved' %}">
+                                <i class="fas fa-check"></i> Approved Requests</a>
+                                <div class="col-md-1"></div>
+                                <a href="{% url 'adminRejected' %}">
+                                <i class="fas fa-times"></i> Rejected Requests</a>
+                            </li>
+                        {% elif requestType == 'approved' %}
+                            <li class="breadcrumb-item"></li>
+                                <a href="{% url 'adminDashboard' %}">
+                                <i class="fas fa-exclamation"></i> Pending Requests</a>
+                                <div class="col-md-1"></div>
+                                <a href="{% url 'adminRejected' %}">
+                                <i class="fas fa-times"></i> Rejected Requests</a>
+                            </li>
+                        {% else %}
+                            <li class="breadcrumb-item"></li>
+                                <a href="{% url 'adminDashboard' %}">
+                                <i class="fas fa-exclamation"></i> Pending Requests</a>
+                                <div class="col-md-1"></div>
+                                <a href="{% url 'adminApproved' %}">
+                                <i class="fas fa-check"></i> Approved Requests</a>
+                            </li>
+                        {% endif %}
+                        
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        
+    </section>
+    <!-- Alerts -->
+    {% include 'partials/_alerts.html' %}
+   
+    <section id="dashboard" class="py-4">
+        <div class="container" style="margin-left:3rem; margin-right:0px; padding-right:0px; max-width:1250px">
+            <div class="row" style="margin-right:0rem">
+                <div class="col-md-16" style="width:100%">
+                    <div class="row" style="max-width:100%">
+                        <div class="col-md-8">
+                            <h2>Welcome Admin 
+                                <a href="{{request.build_absolute_uri}}">
+                                <i class="fa fa-refresh fa-spin fa-fw"></i>
+                                </a>
+                            </h2>
+                        </div>
+                        <div class="col-md-4">
+                            {% if buttonid == 1 %}
+                                <button type="button" id="new" class="btn btn-admin" 
+                                    style="background-color:#041d52; border-color:#041d52;"
+                                >New Users</button>
+                            {% else %}
+                                <a href="{%url 'adminDashboard' %}">
+                                <button type="button" id="new" class="btn btn-admin" >New Users</button>
+                                </a>
+                            {% endif %}
+                            {% if buttonid == 2 %}
+                                <button type="button" id="new" class="btn btn-admin" 
+                                    style="background-color:#041d52; border-color:#041d52;"
+                                >De-Activations</button>
+                            {% else %}
+                                <a href="{%url 'remRequestsAdminDashboard' %}">
+                                <button type="button" id="new" class="btn btn-admin" >De-Activations</button>
+                                </a>
+                            {% endif %}
+                            {% if buttonid == 3 %}
+                                <button type="button" id="new" class="btn btn-admin" 
+                                    style="background-color:#041d52; border-color:#041d52;"
+                                >Resumes</button>
+                            {% else %}
+                                <a href="{%url 'adminDashboard' %}">
+                                <button type="button" id="new" class="btn btn-admin" >Resumes</button>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <p>Here are the pending actions</p>
+                    
+                        <table class="table"  id="requestsTable">
+                            <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Work Email</th>
+                                <th scope="col">Company</th>
+                                <th scope="col">Request Date</th>
+                                <th scope="col">Joined Date</th>
+                                <th scope="col">No. Of Listings</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody >
+                                {% if requests%}
+                                {% for request in requests %}
+                                    <tr>
+                                        <td>{{request.id}}</td>
+                                        <td>{{request.first_name}} {{request.last_name}}</td>
+                                        <td>{{request.profile.workEmail}}</td>
+                                        <td>{{request.profile.companyName}}</td>
+                                        <td>{{request.date_joined}}</td>
+                                        <td>{{request.date_joined}}</td>
+                                        <td>{{request.profile.posts}}</td>
+                                        <td>
+                                            <a class="btn btn-light " href="{% url 'adminProfileView' request.id linkUrl %}">
+                                                View</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                {% else %}
+                                    <tr colspan="8">
+                                        <td>No pending actions</td>
+                                    </tr>
+                                {% endif %}  
+                            </tbody>
+                        </table>
+                                      
+                </div>
+            </div>
+            <!-- till here -->
+
+
+            <div class="row" id="newReqPage">
+                <div class="col-md-12">
+                  {% if requests.has_other_pages %}
+                    <ul class="pagination justify-content-center">
+                      {% if requests.has_previous %}
+                        <li class="page-item">
+                          <a href="?page={{requests.previous_page_number}}" class="page-link">
+                            &laquo;
+                          </a>
+                        </li>
+                      {% endif %}
+                      {% for pg in requests.paginator.page_range%}
+                        {% if requests.number == pg %}
+                          <li class="page-item active">
+                            <a class="page-link">
+                              {{pg}}
+                            </a>
+                          </li>
+                        {% else %}
+                          <li class="page-item">
+                            <a href="?page={{pg}}" class="page-link">
+                              {{pg}}
+                            </a>
+                          </li>
+                        {% endif %}
+                      {% endfor %}
+                      {% if requests.has_next %}
+                        <li class="page-item">
+                          <a href="?page={{requests.next_page_number}}" class="page-link">
+                            &raquo;
+                          </a>
+                        </li>
+                      {% endif %}
+                    </ul>
+                  {% endif %}
+                </div>
+              </div>
+        </div>
+    </section>
+      
+{% endblock %}

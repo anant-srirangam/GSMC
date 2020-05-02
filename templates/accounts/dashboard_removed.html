@@ -7,6 +7,8 @@
 
 
 {% block content %}
+    <!-- Alerts -->
+    {% include 'partials/_alerts.html' %}
     <section id="showcase-dashboard" class="py-5 text-white">
         <div class="container">
         <div class="row text-center">
@@ -25,7 +27,9 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item "> Dashboard</li>
-                        <li class="breadcrumb-item active"><i class="fas fa-check"></i> Active Listings</li>
+                        <li class="breadcrumb-item active">
+                        <i class="fas fa-trash"></i> Removed Listings</li>
+                        
                     </ol>
                 </nav>
             </div>
@@ -33,45 +37,31 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"></li>
-                        <a href="{% url 'dashboardRemoved' %}">
-                        <i class="fas fa-trash"></i> Removed Listings</li></a>
+                        <a href="{% url 'dashboard' %}">
+                            <li class="breadcrumb-item "><i class="fas fa-check"></i> Active Listings</li></a>
                     </ol>
                 </nav>
             </div>
         </div>
         
     </section>
-    <!-- Alerts -->
-    {% include 'partials/_alerts.html' %}
 
     <section id="dashboard" class="py-4">
         <div class="container">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="row">
-                        <div class="col-md-10">
-                            <h2>Welcome {{user.first_name}}
-                                
-                            </h2>
-                        </div>
-                        <div class="col-md-2">
-                              <a href="{% url 'newJob' %}">
-                                <button type="submit" value="submit" class="btn btn-new-job">New Job</button>
-                              </a>
-                        </div>
-                    </div>
-                    
+                    <h2>Welcome {{user.first_name}}</h2>
                     <p>Here are the job listings posted by you</p>
-                    {% if listings%}
+                    {% if listings %}
                         <table class="table">
                             <thead>
                             <tr>
                                 <th scope="col">#</th>
                                 <th scope="col">Job Id</th>
-                                <th scope="col" width="40%">Job Title</th>
-                                <th scope="col">Job Location</th>
+                                <th scope="col" width="30%">Job Title</th>
                                 <th scope="col">Post Date</th>
-                                <th></th>
+                                <th scope="col">Removed By</th>
+                                <th scope="col">Removed Date</th>
                                 <th></th>
                             </tr>
                             </thead>
@@ -79,26 +69,24 @@
                                 {% for listing in listings %}
                                     <tr>
                                         <td>{{listing.id}}</td>
-                                        <td>{{ listing.jobId }}</td>
+                                        <td>{{listing.jobId}}</td>
                                         <td>{{listing.jobTitle}}</td>
-                                        <td>{{listing.location}}</td>
                                         <td>{{listing.list_date}}</td>
+                                        <td>{{listing.removedBy}}</td>
+                                        <td>{{listing.removeDate}}</td>
                                         <td>
-                                        <a class="btn btn-light" href="{% url 'listing' listing.id %}">
-                                            View</a>
+                                          <a href="{% url 'removedListing' listing.id %}" >
+                                            <button type="submit" class="btn btn-light">
+                                              View</button>
+                                            </a>
                                         </td>
-                                        <!-- <td>
-                                            <button type="button" class="btn btn-light remove-item"
-                                            data-toggle="modal" data-target="#inquiryModal">
-                                                <i class="fa fa-trash"> Remove</i></button>
-                                        </td> -->
                                     </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     {% else %}
                         <tr aria-colspan="3">
-                            No listings published so far
+                            No inquiries made so far
                         </tr>
                     {% endif %}
                 </div>
@@ -142,46 +130,5 @@
               </div>
         </div>
     </section>
-    
-  <!-- Inquiry Modal -->
-  <div class="modal fade" id="inquiryModal" role="dialog">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="inquiryModalLabel">Are you sure you want to move this job listing to archive ?</h5>
-          <button type="button" class="close" data-dismiss="modal">
-            <span>&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form action="#" method="POST">
-              {% csrf_token %}
-              
-              <input type="hidden" name="requestType" 
-                {% if user.is_authenticated %}
-                    value="remove"
-                {% else %}
-                    value="apply"
-                {% endif %}
-                required readonly
-              >
-              <div class="row justify-content-center">
-                <div class="col-md-5 text-right">
-                    <button type="submit" class="btn btn-light remove-item" value="Remove"><i class="fa fa-trash"> Remove</i></button>
-                </div>
-                
-                <div class="col-md-5 justify-content-center">
-                    <button type="button" class="btn btn-light btn-new-job" data-dismiss="modal">Cancel</button>
-                </div>
-                
-              </div>
-          </form>
-        </div>
-      </div>
-      
-    </div>
-  </div> 
 
-
-  
 {% endblock %}

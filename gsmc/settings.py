@@ -84,7 +84,7 @@ WSGI_APPLICATION = 'gsmc.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'btredb',
+        'NAME': 'gsmcdb',
         'USER' : 'postgres',
         'PASSWORD' : 'anant@postgres',
         'HOST' : 'localhost'

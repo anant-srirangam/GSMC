@@ -62,7 +62,7 @@
 			<div class="col-md-4">
 				{% for realtor in mvpRealtors%}
 				  <div class="card">
-					<img class="card-img-top" src="{{realtor.photo.url}}" alt="Seller of the month">
+          			<img class="card-img-top" src="{{realtor.photo.url}}" alt="CEO">
 					<div class="card-body">
 					  <h5 class="card-title">CEO</h5>
 					  <h6 class="text-secondary">Geetanjali Bulsu</h6>
@@ -71,7 +71,14 @@
 					</div>
 				  </div>
 				{% endfor %}
-				<button class="btn-primary btn-block btn-lg" data-toggle="modal" data-target="#inquiryModal">Make An Inquiry</button>
+				<div class="row">
+					<hr>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<button class="btn-primary btn-block btn-lg" data-toggle="modal" data-target="#inquiryModal">Make An Inquiry</button>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -88,19 +95,14 @@
 								</button>
 							</div>
 							<div class="modal-body">
-								<form action="{% url 'contact' %}" method="POST">
+								<form action="#" method="POST">
 									  {% csrf_token %}
-									  {% if user.is_authenticated %}
-										  <input type="hidden" name="user_id" value="{{user.id}}">
-									  {% else %}
-										  <input type="hidden" name="user_id" value="0">
-									  {% endif %}
-									  <input type="hidden" name="realtor_email" value="{{ listing.realtor.email }}">
-									  <input type="hidden" name="listing_id" value="{{ listing.id }}">
 									  <div class="form-group">
-										  <label for="property_name" class="col-form-label">Property:</label>
-										  <input type="text" name="listing" class="form-control" value="{{listing.title}}"
-										  readonly>
+										  <label for="user_type" class="col-form-label">User Type</label>
+										  <select name="job_title" class="form-control">
+                        <option selected="true" value="JobSeeker">Job Seeker</option>
+                        <option value="Employer">Employer</option>
+                      </select>
 									  </div>
 									  <div class="form-group">
 										  <label for="name" class="col-form-label">Name:</label>

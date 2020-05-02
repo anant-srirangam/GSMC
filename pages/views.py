@@ -1,13 +1,15 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from listings.models import Listing
 from realtors.models import Realtor
 from listings import choices
 from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
 
 def index(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
     listings = Listing.objects.order_by('-list_date').filter(is_listed=True)
 
-    paginator = Paginator(listings, 20)
+    paginator = Paginator(listings, 2)
     page = request.GET.get('page')
     paged_listings = paginator.get_page(page)
 
@@ -17,14 +19,16 @@ def index(request):
 
     context = {
         'listings': paged_listings,
-        'state_choices': choices.states,
-        'bedroom_choices': choices.bedrooms,
+        'minExp': choices.min_experience(),
+        'maxExp': choices.max_experience(),
         'price_choices': choices.prices
     }
     return render(request, 'pages/index.html', context)
 
 
 def about(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
     realtors = Realtor.objects.order_by('hire_date')
     mvp_realtors = Realtor.objects.all().filter(is_mvp=True)
     context = {

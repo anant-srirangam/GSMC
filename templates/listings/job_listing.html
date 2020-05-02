@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load static %}
+
+
+{% block title %}
+| {{listing.title}}
+{% endblock %}
+
+
+{% block content %}
+        {% include 'partials/_alerts.html' %}
+
+        <section id="showcase-inner" class="py-5 text-white">
+            <div class="container">
+            <div class="row text-center">
+                <div class="col-md-12">
+                <h1 class="display-4">{{listing.jobTitle}}</h1>
+                <p class="lead">
+                    <i class="fas fa-map-marker"></i> {{listing.location}}</p>
+                </div>
+            </div>
+            </div>
+        </section>
+        <!-- Breadcrumb -->
+        <section id="bc" class="mt-3">
+            <div class="container">
+            <nav>
+                <ol class="breadcrumb">
+                    {% if user.is_authenticated %}
+                        <li class="breadcrumb-item">Dashboard</li>
+                        <li class="breadcrumb-item">
+                            <a href="{% url 'dashboard' %}">Active Listings</a>
+                        </li>
+                        <li class="breadcrumb-item active">
+                            {% if listing.jobId %}
+                                {{listing.jobId}} :
+                            {% endif %}    
+                            {{listing.jobTitle}}</li>
+                    {% else %}
+                        <li class="breadcrumb-item"><a href="{% url 'index' %}"><i class="fa fa-home"></i> Home</a></li>
+                        <li class="breadcrumb-item active">{{listing.gmcsJobId}}</li>
+                    {% endif %}
+                    
+                </ol>
+            </nav>
+            </div>
+        </section>
+        
+        <!-- Listing -->
+        <section id="listing" class="py-4">
+            <div class="container">
+                {% if user.is_authenticated %}
+                    <a href="{{linkUrl}}" class="btn btn-light mb-4">Back To Dashboard</a>
+                {% else %}
+                    <a href="{{linkUrl}}" class="btn btn-light mb-4">Back To Listings</a>
+                {% endif %}
+                
+                <div class="row">
+                    <div class="col-md-9">
+                        <hr>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-9 margin-right-10">
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <h2 class="job-title">{{listing.jobTitle}}</h2>
+                                    <p>{{listing.jobId}}</p>
+                                    <p class="fas 1lt2x text-secondary"><i class="fas fa-map-marker"></i> <em>{{listing.location}}</em></p>
+                                </div>
+                                <div class="col-md-2">
+                                    <img src="{{listing.employer.profile.companyLogo.url}}" alt="Company Logo">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <hr>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <label for="Eperience" class="col-form-label fas" style="font-size:large"><em>Experience : </em> 
+                                    </label>
+                                </div>
+                                <div class="col-md-10">
+                                    <label for="Eperience" class="col-form-label fas" style="font-size:large">{{listing.minExp}} to {{listing.maxExp}} years
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <label for="Salary" class="col-form-label fas" style="font-size:large">
+                                        <em>Salary (<i class="fa fa-rupee-sign" style="font-size: small;"></i>) :</em> 
+                                         
+                                    </label>
+                                </div>
+                                <div class="col-md-7">
+                                    <label class="col-form-label fas" style="font-size:large">{{listing.salary | intcomma}} </label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <hr>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <label for="JobDescription" class="col-form-label fas" style="font-size:large"><em>Job Description :</em> 
+                                    </label>
+                                </div>
+                                <div class="col-md-10">
+                                    <p for="JobDescription" class="col-form-label fas 1lt2x" style="text-align:justify">
+                                        {{listing.jobDesc}}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <hr>
+                            </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card mb-3">
+                            <img class="card-img-top" src="{{listing.employer.profile.profileImage.url}}" alt="Recruiter">
+                            <div class="card-body">
+                                <h5 class="card-title">{{listing.employer.first_name}} {{listing.employer.last_name}}</h5>
+                                <h6 class="text-secondary">{{listing.employer.profile.designation}}</h6>
+                                <h6 class="text-secondary"><i class="fa fa-clock"></i> {{listing.list_date}} ({{listing.list_date|naturaltime}})</h6>
+                            </div>
+                        </div>
+                        {% if user.is_authenticated%}
+                        <div class="row justify-content-center">
+                            <button type="button" class="btn btn-light remove-item"
+                            data-toggle="modal" data-target="#inquiryModal">
+                                <i class="fa fa-trash"> Remove Listing</i></button>
+                        </div>
+                            
+                        {% else %}
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <button class="btn-primary btn-block btn-lg" data-toggle="modal" data-target="#inquiryModal">Apply</button>
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+  <!-- Inquiry Modal -->
+				<div class="modal fade" id="inquiryModal" role="dialog">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="inquiryModalLabel">
+                                    {% if user.is_authenticated %}
+                                        Are you sure you want to move this job listing to archive ?
+                                    {% else %}
+                                        Apply for this job
+                                    {% endif %}
+                                    
+                                </h5>
+								<button type="button" class="close" data-dismiss="modal">
+								  <span>&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<form action="{% url 'listingAction' listing.id %}" method="POST" enctype="multipart/form-data">
+                                      {% csrf_token %}
+                                      <input type="hidden" name="requestType" 
+                                        {% if user.is_authenticated %}
+                                            value="remove"
+                                        {% else %}
+                                            value="apply"
+                                        {% endif %}
+                                        required readonly
+                                      >
+                                      <input type="hidden" name="linkUrl" value={{linkUrl}}>
+                                      {% if user.is_authenticated%}
+                                        <div class="row justify-content-center">
+                                            <div class="col-md-5 text-right">
+                                                <button type="submit" class="btn btn-light remove-item" value="Remove"><i class="fa fa-trash"> Remove</i></button>
+                                            </div>
+                                            
+                                            <div class="col-md-5 justify-content-center">
+                                                <button type="button" class="btn btn-light btn-new-job" data-dismiss="modal">Cancel</button>
+                                            </div>
+                                        </div>
+                                      {% else %}
+                                        <div class="form-group">
+                                            <label for="name" class="col-form-label">Name:</label>
+                                            <input type="text" name="name" class="form-control" 
+                                            {% if user.is_authenticated %}
+                                                value="{{user.first_name}} {{user.last_name}}"
+                                            {% endif %}
+                                            required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="email" class="col-form-label">Email:</label>
+                                            <input type="email" name="email" class="form-control" 
+                                            {% if user.is_authenticated %}
+                                                value={{user.email}}
+                                            {% endif %}
+                                            required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="phone" class="col-form-label">Phone:</label>
+                                            <input type="text" name="phone" class="form-control" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="resume" class="col-form-label">Resume:</label>
+                                            <input name="resume" class="form-control" type="file" accept=".doc,.docx,.pdf" required>
+                                        </div>
+                                        {% if not user.is_authenticated %}
+                                            <span style="font-size: smaller; font-style:italic">
+                                                We understand that every job requirement needs a differently formatted resume, hence, we
+                                                encourage you to upload resume everytime you apply for a new job listing and modify your 
+                                                resume accordingly and the same time keep it real.
+                                            </span>
+                                        {% endif %}
+                                        <hr>
+                                        <input type="submit" value="Send" class="btn btn-block btn-secondary">
+                                      {% endif %}
+									  
+								</form>
+							</div>
+						</div>
+					  
+					</div>
+				</div> 
+		
+
+        
+{% endblock %}

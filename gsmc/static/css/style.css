@@ -112,3 +112,105 @@ img {
     font-size: 30px; }
   #showcase-inner h1 {
     font-size: 40px; } }
+
+#login {
+  background: url(../img/employer.jpg) no-repeat fixed center top/cover;
+}
+
+
+.remove-item {
+  background-color: #e94646;
+  border-color: #e94646;
+}.remove-item:hover {
+  background-color: #af2525;
+  border-color: #af2525;
+}
+
+
+.no-right-margin {
+  margin-right: 0px;
+  padding-right: 0px;
+}
+
+
+.no-left-margin {
+  margin-left: 0px;
+  padding-left: 0px;
+}
+
+
+.btn-new-job {
+  color: #fff;
+  background-color: #20a073;
+  border-color: #20a073; }
+  .btn-new-job:hover {
+    color: #fff;
+    background-color: #044730;
+    border-color: #044730; }
+  .btn-new-job:focus, .btn-new-job.focus {
+    box-shadow: 0 0 0 0.2rem #044730; }
+
+    ::-webkit-input-placeholder {
+      font-style: italic;
+   }
+   :-moz-placeholder {
+      font-style: italic;  
+   }
+   ::-moz-placeholder {
+      font-style: italic;  
+   }
+   :-ms-input-placeholder {  
+      font-style: italic; 
+   }
+
+
+   #showcase-dashboard {
+    background: url(../img/dashboard.jpg) no-repeat fixed center top/cover;
+    position: relative;
+    overflow: hidden;
+    min-height: 200px; }
+    #showcase-dashboard::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      min-height: 100%;
+      width: 100%;
+      background: rgba(32, 134, 107, 0.8); }
+    #showcase-dashboard.showcase-search {
+      min-height: 270px; }
+
+
+.job-title {
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  font-size: 3em;
+}
+
+.btn-admin {
+  color: #fff;
+  background-color: #5f8bc5;
+  border-color: #5f8bc5; }
+  .btn-admin:hover {
+    color: #fff;
+    background-color: #041d52;
+    border-color: #041d52; }
+  .btn-admin:focus, .btn-admin.focus {
+    box-shadow: 0 0 0 0.2rem #041d52; }
+
+    ::-webkit-input-placeholder {
+      font-style: italic;
+   }
+   :-moz-placeholder {
+      font-style: italic;  
+   }
+   ::-moz-placeholder {
+      font-style: italic;  
+   }
+   :-ms-input-placeholder {  
+      font-style: italic; 
+   }
+
+
+.fa-refresh:before {
+    content: "\f021"; }
+  
