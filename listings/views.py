@@ -51,10 +51,10 @@ def search(request):
         if keywords:
             listings = listings.filter(description__icontains=keywords)
 
-    if 'city' in request.GET:
-        keywords = request.GET['city']
+    if 'company' in request.GET:
+        keywords = request.GET['company']
         if keywords:
-            listings = listings.filter(city__iexact=keywords)
+            listings = listings.filter(employer__profile__companyName__iexact=keywords.replace('+',' '))
 
     if 'state' in request.GET:
         keywords = request.GET['state']
@@ -79,9 +79,9 @@ def search(request):
     
     context = {
         'listings': paged_listings,
-        'state_choices': choices.states,
-        'bedroom_choices': choices.bedrooms,
-        'price_choices': choices.prices,
+        # 'state_choices': choices.states,
+        # 'bedroom_choices': choices.bedrooms,
+        # 'price_choices': choices.prices,
         'values': request.GET
     }
 
