@@ -2,10 +2,11 @@ from django.shortcuts import render,get_object_or_404,redirect
 from .models import Listing
 from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
 from django.urls import reverse
-from . import choices
 from django.contrib import messages
 from django.contrib.auth.models import User
 from datetime import datetime
+from urllib.parse import urlparse
+from .choices import *
 
 def index(request):
     if request.user.is_authenticated:
@@ -44,6 +45,8 @@ def listing(request, listing_id):
 def search(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
+
+    print(urlparse(request.build_absolute_uri()))
     listings = Listing.objects.order_by('-list_date').filter(is_listed=True)
     
     if 'keywords' in request.GET:
@@ -53,38 +56,38 @@ def search(request):
 
     if 'company' in request.GET:
         keywords = request.GET['company']
-        if keywords:
-            listings = listings.filter(employer__profile__companyName__iexact=keywords.replace('+',' '))
+        if keywords and keywords != 'Company (All)':
+            listings = listings.filter(employer__profile__company=keywords)
 
-    if 'state' in request.GET:
-        keywords = request.GET['state']
-        if keywords and keywords != "State (Any)":
-            listings = listings.filter(state__iexact=keywords)
+    if 'jobTitle' in request.GET:
+        keywords = request.GET['jobTitle']
+        if keywords and keywords != "Job Title (All)":
+            listings = listings.filter(jobTitle__iexact=keywords)
 
-    if 'bedrooms' in request.GET:
-        keywords = request.GET['bedrooms']
-        if keywords and keywords != "Bedrooms (Any)":
-            listings = listings.filter(bedrooms__iexact=keywords)
+    if 'minExp' in request.GET:
+        keywords = request.GET['minExp']
+        if keywords and keywords != "Min Exp (All)":
+            listings = listings.filter(minExp__gte=keywords)
 
-    if 'price' in request.GET:
-        keywords = request.GET['price']
-        if keywords and keywords != "Max Price (Any)":
-            listings = listings.filter(price__lte=keywords)
+    if 'maxExp' in request.GET:
+        keywords = request.GET['maxExp']
+        if keywords and keywords != "Max Exp (All)":
+            listings = listings.filter(maxExp__lte=keywords)
+
 
    
-    paginator = Paginator(listings, 3)
+    paginator = Paginator(listings, 2)
     page = request.GET.get('page')
     paged_listings = paginator.get_page(page)
 
-    
     context = {
         'listings': paged_listings,
-        # 'state_choices': choices.states,
-        # 'bedroom_choices': choices.bedrooms,
-        # 'price_choices': choices.prices,
+        'minExpList': getMinExpList(),
+        'maxExpList': getMaxExpList(),
+        'companyList': getCompanyList(),
+        'jobTitleList':getJobTitleList(),
         'values': request.GET
     }
-
 
     return render(request, 'listings/search.html', context)
 
@@ -96,12 +99,12 @@ def newJob(request):
     if request.user.username == 'admin':
         return redirect('adminDashboard')
     
-    company = request.user.profile.companyName.split(' ')[0][:3]
+    company = request.user.profile.company.companyName.split(' ')[0][:3]
     now = datetime.now()
 
     context = {
-            'min_experience': choices.min_experience(),
-            'max_experience': choices.max_experience(),
+            'min_experience': min_experience(),
+            'max_experience': max_experience(),
             'gmcsJobId': f"{request.user.id}_{company.upper()}{now.year}{now.month}{now.day}"
         }
     return render(request, 'listings/new_job.html', context)
@@ -131,17 +134,30 @@ def listingAction(request, listing_id):
             if resume.content_type not in fileTypes:
                 messages.error(request, 'Invalid file type')
                 return redirect('listing',7)
-            if resume.size/1024 > 20:
+            if resume.size/1024 > 500:
                 messages.error(request, 'file too big')
                 return redirect('listing',7)
             messages.success(request, 'Successfully applied...')
-            return redirect('listing',7)
+
+            listing = Listing.objects.get(pk=listing_id)
+
+            listing.noOfApplies = listing.noOfApplies+1
+            listing.save()
+
+            return redirect('listing',listing_id)
         elif request.POST['requestType'] == 'remove':
             listing = Listing.objects.get(pk=listing_id)
             listing.removeDate = datetime.now()
             listing.removedBy = 'user'
             listing.is_listed = False
             listing.save()
+
+            user = User.objects.get(pk=request.user.id)
+
+            user.profile.livePosts = user.profile.livePosts-1
+            
+            user.save()
+            
             messages.success(request, 'Listing successfully archived...')
             return redirect(request.POST['linkUrl'])
     else:
@@ -184,5 +200,11 @@ def addJob(request):
     listing.gmcsJobId = f"{gmcsJobId}{listing.id}"
     listing.save()
 
-    messages.success(request, 'Post request sent for admin approval')
+    user = User.objects.get(pk=request.user.id)
+
+    user.profile.posts = user.profile.posts+1
+    user.profile.livePosts = user.profile.livePosts+1
+
+    user.save()
+    messages.success(request, 'Job listing made live')
     return redirect('dashboard')

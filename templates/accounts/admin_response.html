@@ -1,0 +1,13 @@
+{% autoescape off %}
+
+===========THIS IS A SYSTEM GENERATED MAIL. PLEASE DO NOT REPLY TO THIS!===========
+
+
+Dear {{ user.first_name }} {{user.last_name}} ,
+
+
+Your request for {{requestFor}} has been {{adminAction}} by our company.
+
+{{message}}
+
+{% endautoescape %}

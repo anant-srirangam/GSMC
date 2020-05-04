@@ -1,8 +1,10 @@
 from django.shortcuts import render,redirect
 from listings.models import Listing
 from realtors.models import Realtor
-from listings import choices
+from accounts.models import CompanyMaster
+from listings.choices import *
 from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
+
 
 def index(request):
     if request.user.is_authenticated:
@@ -14,14 +16,11 @@ def index(request):
     paged_listings = paginator.get_page(page)
 
     context = {
-        'listings': paged_listings
-    }
-
-    context = {
         'listings': paged_listings,
-        'minExp': choices.min_experience(),
-        'maxExp': choices.max_experience(),
-        'price_choices': choices.prices
+        'minExpList': getMinExpList(),
+        'maxExpList': getMaxExpList(),
+        'companyList': getCompanyList(),
+        'jobTitleList':getJobTitleList()
     }
     return render(request, 'pages/index.html', context)
 

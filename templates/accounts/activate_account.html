@@ -1,7 +1,25 @@
 {% autoescape off %}
-Hi {{ user.first_name }} ,
+
+===========THIS IS A SYSTEM GENERATED MAIL. PLEASE DO NOT REPLY TO THIS!===========
+
+
+Dear {{ user.first_name }} {{user.last_name}} ,
 
 
 Please click on the link to confirm your registration,
 http://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+
+
+Please remember, activation is a two step process and requires both the user and the admin to 
+authenticate the registration. In case you are unable to login after clicking on the above link,
+we suggest you wait till you receive an email confirming the activation from admin team.
+
+
+Regards,
+
+Admin Team
+GeetSai Manpower Consultancy
+http://localhost:8000
+
+
 {% endautoescape %}

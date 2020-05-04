@@ -58,9 +58,9 @@
                             <div class="col-md-9">
                                 <h3 hidden>rec</h3>
                                 <h2 class="job-title">{{employer.first_name|upper}} {{employer.last_name|upper}}</h2>
-                                <p>{{employer.profile.designation}}, {{employee.profile.companyName}}</p>
+                                <p>{{employer.profile.designation}}, {{employer.profile.company.companyName}}</p>
                                 <p style="font-style: italic; font-size:small; color:darkslateblue">
-                                    <a href="{{employer.profile.companyURL}}">{{employer.profile.companyURL}}</a>
+                                    <a href="{{employer.profile.company.companyURL}}">{{employer.profile.company.companyURL}}</a>
                                 </p>
                                 <p class="fas 1lt2x text-secondary"><i class="fas fa-map-marker"></i> <em>{{employer.profile.location}}</em></p>
                                 
@@ -105,7 +105,7 @@
                                 
                             </div>
                             <div class="col-md-2">
-                                <img src="{{ employer.profile.companyLogo.url }}" alt="Company Logo">
+                                <img src="{{ employer.profile.company.companyLogo.url }}" alt="Company Logo">
                                 <div class="row"><hr></div>
                                 {% if user.username != 'admin' %}
                                     <div class="row justify-content-center">

@@ -16,58 +16,61 @@
             <form action="{% url 'searchListing' %}">
                 <!-- Form Row 1 -->
                 <div class="form-row">
-                <div class="col-md-4 mb-3">
+                  <div class="col-md-4 mb-3">
                     <label class="sr-only">Keywords</label>
-                    <input type="text" name="keywords" class="form-control" placeholder="Keyword (Pool, Garage, etc)" value="{{values.keywords}}">
-                </div>
+                    <input type="text" name="keywords" class="form-control" placeholder="Keyword (Job title, Job Desc..)" value="{{values.keywords}}">
+                  </div>
 
-                <div class="col-md-4 mb-3">
-                    <label class="sr-only">City</label>
-                    <input type="text" name="city" class="form-control" placeholder="City" value="{{values.city}}">
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label class="sr-only">State</label>
-                    <select name="state" class="form-control">
-                        <option selected="true" >State (Any)</option>
-                        {% for key,value in state_choices.items %}
-                            <option value="{{key}}" 
-                                {% if key == values.state%}
-                                    selected = "true"
-                                {% endif %}
-                            >{{value}}</option>
+                  <div class="col-md-4 mb-3">
+                    <label class="sr-only">Company</label>
+                    <select name="company" class="form-control">
+                        <option selected="true" >Company (All)</option>
+                        {% for companyObj in companyList %}
+                            <option value="{{companyObj.employer__profile__company__id}}"
+                            {%ifequal values.company|add:'0' companyObj.employer__profile__company__id %}
+                              selected="true"
+                            {% endifequal %}>{{companyObj.employer__profile__company__companyName}}</option>
                         {% endfor %}
                     </select>
-                </div>
-                </div>
-                <!-- Form Row 2 -->
-                <div class="form-row">
-                <div class="col-md-6 mb-3">
-                    <label class="sr-only">Bedrooms</label>
-                    <select name="bedrooms" class="form-control">
-                    <option selected="true" >Bedrooms (Any)</option>
-                        {% for key,value in bedroom_choices.items %}
-                            <option value="{{key}}" 
-                                {% if key == values.bedrooms %}
-                                    selected = "true"
-                                {% endif %}
-                            >{{value}}</option>
+                  </div>
+                  
+                  <div class="col-md-4 mb-3">
+                    <label class="sr-only">Job Title</label>
+                    <select name="jobTitle" class="form-control">
+                        <option selected="true" >Job Title (All)</option>
+                        {% for title in jobTitleList %}
+                            <option value="{{title}}"{%ifequal values.jobtTitle|stringformat:"i" title|stringformat:"i" %}
+                            selected="true"
+                          {% endifequal %}>{{title}}</option>
                         {% endfor %}
                     </select>
+                  </div>
                 </div>
-                <div class="col-md-6 mb-3">
-                    <select name="price" class="form-control">
-                    <option selected="true" >Max Price (Any)</option>
-                        {% for key,value in price_choices.items %}
-                            <option value="{{key}}"  
-                                {% if key == values.price%}
-                                    selected = "true"
-                                {% endif %}
-                            >{{value}}</option>
+                <div class="form-row justify-content-center">
+                  <div class="col-md-2 mb-3">
+                    <label class="sr-only">Min Experience</label>
+                    <select name="minExp" class="form-control">
+                        <option selected="true" >Min Exp (All) </option>
+                        {% for exp in minExpList %}
+                            <option value="{{exp}}"{%ifequal values.minExp|add:'0' exp %}
+                            selected="true"
+                          {% endifequal %}>{{exp}} years</option>
                         {% endfor %}
                     </select>
+                  </div>
+                  <div class="col-md-2 mb-3">
+                    <label class="sr-only">Max Experience</label>
+                    <select name="maxExp" class="form-control">
+                        <option selected="true" >Max Exp (All) </option>
+                        {% for exp in maxExpList %}
+                            <option value="{{exp}}"{%ifequal values.maxExp|add:'0' exp %}
+                            selected="true"
+                          {% endifequal %}>{{exp}} years</option>
+                        {% endfor %}
+                    </select>
+                  </div>
                 </div>
-                </div>
-                <button class="btn btn-secondary btn-block mt-4" type="submit">Submit form</button>
+                <button class="btn btn-secondary btn-block mt-4" type="submit">Search</button>
             </form>
             </div>
         </div>
@@ -83,106 +86,149 @@
                 <a href="{% url 'index'%}">
                 <i class="fas fa-home"></i> Home</a>
             </li>
-            <li class="breadcrumb-item">
-                <a href="{% url 'listings' %}">Browse Listings</a>
-            </li>
             <li class="breadcrumb-item active"> Search Results</li>
             </ol>
         </nav>
         </div>
     </section>
+    <div class="row"><hr></div>
+    <div class="row " style="font-family:Georgia, 'Times New Roman', Times, serif; max-width:1300px; margin-left:35px">
+      <div class="col-md-5" style="padding-top:1rem; padding-bottom:1rem; max-width:35%">
+        <hr style="height:0.2rem;  border-color:#10284e; background-color:#10284e; margin-bottom:0rem; " noshade="true">
+        <hr style="height:0.2rem;  border-color:#10284e; background-color:#10284e;margin-top:0.2rem" noshade="true">
+      </div>
+      <div class="col-md-4" style="max-width:29%">
+        <h2 style="font-size:4rem; text-align:center; overflow:visible">Job Listings</h2>
+      </div>
+      <div class="col-md-5" style="padding-top:1rem; padding-bottom:1rem;  max-width:35%">
+        <hr style="height:0.2rem;  border-color:#10284e; background-color:#10284e; margin-bottom:0rem; " noshade="true">
+        <hr style="height:0.2rem;  border-color:#10284e; background-color:#10284e;margin-top:0.2rem" noshade="true">
+      </div>
+    </div>
     <!-- Listings -->
-    <section id="listings" class="py-4">
-        <div class="container">
-			<div class="row">
-                {% if listings %}
-					{% for listing in listings %}
-						<div class="col-md-6 col-lg-4 mb-4">
-							<div class="card listing-preview">
-								<img class="card-img-top" src="{{listing.photo_main.url}}" alt="">
-								<div class="card-img-overlay">
-								<h2>
-									<span class="badge badge-secondary text-white">${{listing.price | intcomma}}</span>
-								</h2>
-								</div>
-								<div class="card-body">
-								<div class="listing-heading text-center">
-									<h4 class="text-primary">{{listing.title}}</h4>
-									<p>
-									<i class="fas fa-map-marker text-secondary"></i> {{listing.city}} {{listing.state}}, {{listing.zipcode}}</p>
-								</div>
-								<hr>
-								<div class="row py-2 text-secondary">
-									<div class="col-6">
-									<i class="fas fa-th-large"></i> Sqft: {{listing.sqft}}</div>
-									<div class="col-6">
-									<i class="fas fa-car"></i> Garage: {{listing.garage}}</div>
-								</div>
-								<div class="row py-2 text-secondary">
-									<div class="col-6">
-									<i class="fas fa-bed"></i> Bedrooms: {{listing.bedrooms}}</div>
-									<div class="col-6">
-									<i class="fas fa-bath"></i> Bathrooms: {{listing.bathrooms}}</div>
-								</div>
-								<hr>
-								<div class="row py-2 text-secondary">
-									<div class="col-12">
-									<i class="fas fa-user"></i> {{listing.realtor}}</div>
-								</div>
-								<div class="row text-secondary pb-2">
-									<div class="col-6">
-									<i class="fas fa-clock"></i>{{listing.list_date | timesince}}</div>
-								</div>
-								<hr>
-								<a href="{% url 'listing' listing.id %}" class="btn btn-primary btn-block">More Info</a>
-								</div>
-							</div>
-						</div>
-					{% endfor %}
-				{% else %}
-					<div class="col-md-12">
-						<p>No Listings Available</p>
-					</div>
-				{% endif %}
+    <section id="listings" class="py-5">
+        <div class="container" style="margin-left:20px; margin-right:20px;max-width:1300px">
+      <!-- <h3 class="text-center mb-3">Latest Listings</h3> -->
+      <div class="row" >
+        <div class="col-md-1"></div>
+        <div class="col-md-4 btn-primary" style="border-radius:0.8rem; margin-right:0.5rem">
+          <h5  style="margin-bottom:0.3rem; margin-top:0.3rem">Job Title</h5>
+        </div>
+        <div class="col-md-4" style="border-radius:0.8rem;background-color: rgb(202, 241, 241); margin-right:0.5rem">
+          <h5 style="margin-bottom:0.3rem; margin-top:0.3rem">Company</h5>
+        </div>
+        <div class="col-md-2 btn-primary" style="border-radius:0.8rem;">
+          <h5 style="margin-bottom:0.3rem; margin-top:0.3rem">Posted Date</h5>
+        </div>
+        <div class="col-md-1">
+        </div>
+      </div>
+      <div class="row"><hr></div>
+      {% for listing in listings %}
+        <div class="row">
+          <div class="col-md-1">
+            <div class="row justify-content-right">
+              <div class="col-md-12">
+                <img class="icon" src="{{listing.employer.profile.company.companyLogo.url}}" alt="company_logo" style="display:block">
+
+              </div>
             </div>
-            <div class="row">
-                <div class="col-md-12">
-                  {% if listings.has_other_pages %}
-                    <ul class="pagination">
-                      {% if listings.has_previous %}
-                        <li class="page-item">
-                          <a href="?page={{listings.previous_page_number}}" class="page-link">
-                            &laquo;
-                          </a>
-                        </li>
-                      {% endif %}
-                      {% for pg in listings.paginator.page_range%}
-                        {% if listings.number == pg %}
-                          <li class="page-item active">
-                            <a class="page-link">
-                              {{pg}}
-                            </a>
-                          </li>
-                        {% else %}
-                          <li class="page-item">
-                            <a href="?page={{pg}}" class="page-link">
-                              {{pg}}
-                            </a>
-                          </li>
-                        {% endif %}
-                      {% endfor %}
-                      {% if listings.has_next %}
-                        <li class="page-item">
-                          <a href="?page={{listings.next_page_number}}" class="page-link">
-                            &raquo;
-                          </a>
-                        </li>
-                      {% endif %}
-                    </ul>
-                  {% endif %}
+            
+          </div>
+          <div class="col-md-4">
+            <h5>{{listing.jobTitle}}</h5>
+            <h6 class="text-secondary">
+              <div class="row">
+                <div class="col-md-6">
+                  <i class="fas fa-th-large"></i>  {{listing.minExp}} to {{listing.maxExp}} Years
+                </div>
+                <div class="col-md-6">
+                  <i class="fas fa-money-bill"></i>  <i class="fas fa-rupee-sign"></i> {{listing.salary | intcomma}}
                 </div>
               </div>
+            </h6>
+          </div>
+          <div class="col-md-4">
+            <h5>
+            <i class="fas fa-building "> </i> 
+              {{listing.employer.profile.company.companyName}}</h5>
+              <div class="row">
+                <div class="col-md-12">
+                  <span class="text-secondary"><i class="fas fa-map-marker "></i> {{listing.location}}</span>
+                </div>
+                
+              </div>
+              
+          </div>
+          <div class="col-md-2">
+            <div class="row">
+              <div class="col-md-12" style="margin-left:0.2rem">
+                <span style="color:#10284e;"><i class="fas fa-clock"></i> {{listing.list_date}} 
+                  ({{listing.list_date | naturaltime}})</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-1">
+            <div class="row">
+              <div class="col-md-12">
+                <a href="{% url 'listing' listing.id %}" class="btn btn-primary btn-block">View</a>
+              </div>
+            </div>
+          </div>
         </div>
+        <div class="row">
+          <div class="col-md-12">
+            <hr>
+          </div>
+        </div>
+      {% endfor %}
+      <div class="row">
+        <hr>
+      </div>
+      <div class="row">
+        <hr>
+      </div>
+			<div class="row justify-content-center">
+                <div class="row">
+                    <div class="col-md-12">
+                      {% if listings.has_other_pages %}
+                        <ul id="pages" class="pagination justify-content-center" max-size="2">
+                          {% if listings.has_previous %}
+                            <li class="page-item">
+                              <a href="?page={{listings.previous_page_number}}" class="page-link">
+                                &laquo;
+                              </a>
+                            </li>
+                          {% endif %}
+                          {% for pg in listings.paginator.page_range%}
+                            {% if listings.number == pg %}
+                              <li class="page-item active">
+                                <a class="page-link">
+                                  {{pg}}
+                                </a>
+                              </li>
+                            {% else %}
+                              <li class="page-item">
+                                <a href="?page={{pg}}" class="page-link">
+                                  {{pg}}
+                                </a>
+                              </li>
+                            {% endif %}
+                          {% endfor %}
+                          {% if listings.has_next %}
+                            <li class="page-item">
+                              <a href="?page={{listings.next_page_number}}" class="page-link">
+                                &raquo;
+                              </a>
+                            </li>
+                          {% endif %}
+                        </ul>
+                      {% endif %}
+                    </div>
+                  </div>
+            
+		</div>
+        
     </section>
-
+    
 {% endblock %}

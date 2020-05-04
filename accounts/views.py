@@ -9,8 +9,9 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
+from django.db.models import Q
 from listings.models import Listing
-from .models import user_directory_path_profile, AdminActions
+from .models import user_directory_path_profile, AdminActions, CompanyMaster, Profile
 from datetime import datetime
 import imghdr
 import os
@@ -37,42 +38,76 @@ def register(request):
         #regiter user
         first_name = request.POST['first_name']
         last_name = request.POST['last_name']
-        username = request.POST['email']
+        username = f"{request.POST['email']}__email"
         email = request.POST['email']
         password = request.POST['password']
         password2 = request.POST['password2']
         phone = request.POST['phone']
         workEmail = request.POST['email']
-        companyName = request.POST['companyName']
-        companyURL = request.POST['companyUrl']
+        company = request.POST['company']
+        companyName = request.POST.get('companyName',False)
+        companyURL = request.POST.get('companyUrl',False)
         designation = request.POST['designation']
         location = request.POST['location']
-        companyLogo = request.FILES['companyLogo']
+        companyLogo = request.FILES.get('companyLogo',False)
         profileImage = request.FILES['profileImage']
+
+        companyList = CompanyMaster.objects.filter(id__gt=0)
+        context = {
+            'companyList':companyList,
+            'first_name' : first_name,
+            'last_name' : last_name,
+            'username' : email,
+            'email' : email,
+            'password' : password,
+            'password2' : password2,
+            'phone' : phone,
+            'workEmail' : email,
+            'company' : company,
+            'companyName' : companyName,
+            'companyURL' : companyURL,
+            'designation' : designation,
+            'location' : location,
+            'companyLogo' : companyLogo,
+            'profileImage' : profileImage
+        }
 
         if password != password2:
             messages.error(request, 'Passwords do not match')
             return redirect('register')
-        # if User.objects.filter(username=username,profile__admin_verified__in=[0,1] ).exists():
-        #     messages.error(request, 'Username already exists')
-            return redirect('register') 
-        elif User.objects.filter(email=email, profile__admin_verified__in=[0,1]).exists():
+        if User.objects.filter(username=username,profile__admin_verified__in=[0,1] ).exists():
+            messages.error(request, 'Username already exists')
+            return  render(request, 'accounts/register.html', context) 
+        elif User.objects.filter(email=email, profile__admin_verified__in=[0,1], profile__request_for__lt='de-activation').exists():
             messages.error(request, 'Email already exists')
-            return redirect('register') 
+            return render(request, 'accounts/register.html', context) 
+        elif company == '<<--Company-->>':
+            messages.error(request, 'Please select the company')
+            return render(request, 'accounts/register.html', context) 
         elif imghdr.what(profileImage) is None:
             messages.error(request, 'Profile image file type improper')
-            return redirect('register') 
-        elif imghdr.what(companyLogo) is None:
+            return render(request, 'accounts/register.html', context) 
+        elif companyLogo and imghdr.what(companyLogo) is None:
             messages.error(request, 'Company logo file type improper')
-            return redirect('register') 
+            return render(request, 'accounts/register.html', context) 
         elif profileImage.size/1024 > 500:
             messages.error(request, 'Profile image file too big')
-            return redirect('register') 
-        elif companyLogo.size/1024 > 100:
+            return render(request, 'accounts/register.html', context) 
+        elif companyLogo and companyLogo.size/1024 > 100:
             messages.error(request, 'Company logo file too big')
-            return redirect('register') 
+            return render(request, 'accounts/register.html', context) 
         else:
-            user = User.objects.create_user(username=f"{username}__email",
+            if company == 'Other' and not CompanyMaster.objects.filter(companyName=companyName).exists():
+                company = CompanyMaster.objects.create(companyName=companyName,
+                                                        companyURL=companyURL,
+                                                        companyLogo = companyLogo)
+            elif companyName and CompanyMaster.objects.filter(companyName=companyName).exists():
+                company = CompanyMaster.objects.get(companyName=companyName)
+            else:
+                company = CompanyMaster.objects.get(id=company)
+
+
+            user = User.objects.create_user(username=username,
                                             password=password,
                                             first_name=first_name,
                                             last_name=last_name,
@@ -80,11 +115,11 @@ def register(request):
                                             is_active=False)
             user.profile.phone = phone
             user.profile.workEmail = workEmail
-            user.profile.companyName = companyName
-            user.profile.companyURL = companyURL
+            user.profile.company = company
+            # user.profile.companyURL = companyURL
             user.profile.designation = designation
             user.profile.location = location
-            user.profile.companyLogo = companyLogo
+            # user.profile.companyLogo = companyLogo
             user.profile.profileImage = profileImage
             
             token = _make_hash_value(user)
@@ -99,7 +134,12 @@ def register(request):
             return redirect('index')
         
     else:
-        return render(request, 'accounts/register.html')
+        companyList = CompanyMaster.objects.filter(id__gt=0)
+
+        context = {
+            'companyList':companyList,
+        }
+        return render(request, 'accounts/register.html', context)
 
 
 def login(request):
@@ -298,6 +338,11 @@ def adminAction(request, user_id, linkUrl):
                                             username=user.username,
                                             requestFor='activation',
                                             adminReqAction='approved')
+
+                sendAdminEmail(user=user,
+                                requestFor='activation',
+                                adminAction='approved'
+                                )
                 messages.success(request, 'User approved')
                 return redirect(linkUrl)
             elif requestType == 'reject':
@@ -311,6 +356,11 @@ def adminAction(request, user_id, linkUrl):
                                             username=user.email,
                                             requestFor='activation',
                                             adminReqAction='rejected')
+                sendAdminEmail(user=user,
+                                requestFor='activation',
+                                adminAction='rejected',
+                                comments=request.POST['rejectComments']
+                                )
                 messages.success(request, 'User rejected')
                 return redirect(linkUrl)
         elif user.profile.request_for == 'de-activation':
@@ -326,6 +376,10 @@ def adminAction(request, user_id, linkUrl):
                                             username=user.email,
                                             requestFor='de-activation',
                                             adminReqAction='approved')
+                sendAdminEmail(user=user,
+                                requestFor='de-activation',
+                                adminAction='approved'
+                                )
                 messages.success(request, 'User de-activated')
                 return redirect(linkUrl)
             elif requestType == 'reject':
@@ -339,10 +393,96 @@ def adminAction(request, user_id, linkUrl):
                                             username=user.username,
                                             requestFor='de-activation',
                                             adminReqAction='rejected')
+                sendAdminEmail(user=user,
+                                requestFor='de-activation',
+                                adminAction='rejected',
+                                comments=request.POST['rejectComments']
+                                )
                 messages.success(request, 'Removal rejected')
                 return redirect(linkUrl)
     else:
         return get_object_or_404(User, pk=0)
+
+
+def sendAdminEmail(user, requestFor, adminAction, comments=''):
+    email_subject = 'Admin Action Notification'
+    content = ''
+    print(adminAction,requestFor)
+
+    if adminAction=='approved' and requestFor=='activation':
+        print(adminAction,requestFor)
+        content =f'''                    We are really glad to have you on our team and are looking forward for a great journey together.
+                    In case, you have not yet verified your activation, do remember this is a two step activation 
+                    and requires both user and admin to perform the activation. The activation has already been sent
+                    to your mail box upon registration.
+
+                    Once, the registration process is complete, you may login with your creds and start maintaining
+                    your dashboard.
+
+                    Username : {user.email}
+                    Password : < Your set password >
+
+
+                    Regards,
+
+                    Admin Team
+                    GeetSai Manpower Consultancy
+                    http://localhost:8000 '''
+
+    if adminAction=='rejected' and requestFor=='activation':
+        print(adminAction,requestFor)
+        content =f'''                    We regret that we could not be a part of the same team at this moment. We would also like you
+                    to know that we maintain 100% transperancy, hence, please find below the reason why your request 
+                    has been rejected.
+
+                    Admin Comments : {comments}
+
+                    Nevertheless, you are always welcome to apply again and we do hope that one day we are on the same
+                    team.
+
+                    Regards,
+
+                    Admin Team
+                    GeetSai Manpower Consultancy
+                    http://localhost:8000 '''
+    if adminAction=='approved' and requestFor=='de-activation':
+        print(adminAction,requestFor)
+        content =f'''                    With great distress we end our journey here as a team and we wish you stayed a little longer.
+
+                    We would like to thank you for walking this far with us and you are always welcome to join in
+                    any time in the future.
+
+                    Regards,
+
+                    Admin Team
+                    GeetSai Manpower Consultancy
+                    http://localhost:8000 '''
+    if adminAction=='rejected' and requestFor=='de-activation':
+        print(adminAction,requestFor)
+        content =f'''                    It is true that we want to hold on to you but we are sure our admin team has a valid reason
+                    for rejecting your request. Please find below what the admin team had to say on it's behalf.
+
+                    Admin Comments : {comments}
+
+                    If you are not satisfied with the response, you can connect with us and the details are mentioned
+                    on the top of every page of our website.
+
+                    Regards,
+
+                    Admin Team
+                    GeetSai Manpower Consultancy
+                    http://localhost:8000 '''
+
+    message = render_to_string('accounts/admin_response.html', {
+                'user': user,
+                'requestFor': requestFor,
+                'adminAction': adminAction,
+                'message': content,
+            })
+    to_email = user.email
+    email = EmailMessage(email_subject, message, to=[to_email])
+    email.send()
+
 
 def profile(request):
     if not request.user.is_authenticated:
@@ -393,7 +533,7 @@ def changeProfile(request):
         request.user.profile.profileImage = profileImage
         request.user.save()
 
-        messages.success(request, 'Request has been submitted. Pending with admin for approval');
+        messages.success(request, 'Profile Image changed successfully')
         return redirect('profile')
 
     if request.user.is_authenticated:
@@ -447,15 +587,15 @@ def activate(request, uidb64, token):
         user.profile.user_verified = True
         user.save()
         if user.profile.admin_verified == 1:
-            user.is_Active=True
+            user.is_active=True
+            user.save()
             user.profile.action = "UserAdded"
+            user.save()
             message = 'Account Verified.... Please login!!!!'
             loc = 'login'
         else:
             message = 'Account Verified.... Please wait while admin approves your account'
             loc = 'index'
-        
-        user.save
         
         messages.success(request, message)
         return redirect(loc)
@@ -477,3 +617,5 @@ def getNewAddReq(request):
         'requestType': 'pending'
     }
     return render(request, 'accounts/newReq.html', context)
+
+
