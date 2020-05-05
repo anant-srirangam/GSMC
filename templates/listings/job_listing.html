@@ -122,10 +122,30 @@
                             <div class="card-body">
                                 <h5 class="card-title">{{listing.employer.first_name}} {{listing.employer.last_name}}</h5>
                                 <h6 class="text-secondary">{{listing.employer.profile.designation}}</h6>
-                                <h6 class="text-secondary"><i class="fa fa-clock"></i> {{listing.list_date}} ({{listing.list_date|naturaltime}})</h6>
+                                <h6 class="text-secondary"><i class="fa fa-clock"></i> {{listing.list_date}} ({{listing.list_date | naturaltime}})</h6>
                             </div>
                         </div>
                         {% if user.is_authenticated%}
+                        <div class="mb-3 ">
+                            <div class="row ">
+                                <div class="col-md-12 text-center fas fa-1lt2x">
+                                    Applications : {{listing.noOfApplies}}
+                                </div>
+                            </div>
+                            <div class="row"><hr></div>
+                            <div class="row">
+                                <div class="col-md-12 text-center fas fa-1lt2x">
+                                    Shortlists : {{listing.shortLists}}
+                                </div>
+                            </div>
+                            <div class="row"><hr></div>
+                            <div class="row">
+                                <div class="col-md-12 text-center fas fa-1lt2x">
+                                    Selections : {{listing.selections}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row"><hr></div>
                         <div class="row justify-content-center">
                             <button type="button" class="btn btn-light remove-item"
                             data-toggle="modal" data-target="#inquiryModal">
@@ -163,7 +183,13 @@
 								</button>
 							</div>
 							<div class="modal-body">
-								<form action="{% url 'listingAction' listing.id %}" method="POST" enctype="multipart/form-data">
+                                <form 
+                                    {% if user.is_authenticated %}
+                                        action="{% url 'listingAction' listing.id %}"
+                                    {% else %}
+                                        action="{% url 'applyListing' listing.id %}"
+                                    {% endif %} 
+                                    method="POST" enctype="multipart/form-data">
                                       {% csrf_token %}
                                       <input type="hidden" name="requestType" 
                                         {% if user.is_authenticated %}
@@ -213,7 +239,7 @@
                                             <span style="font-size: smaller; font-style:italic">
                                                 We understand that every job requirement needs a differently formatted resume, hence, we
                                                 encourage you to upload resume everytime you apply for a new job listing and modify your 
-                                                resume accordingly and the same time keep it real.
+                                                resume accordingly and at the same time keep it real.
                                             </span>
                                         {% endif %}
                                         <hr>

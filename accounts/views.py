@@ -473,7 +473,7 @@ def sendAdminEmail(user, requestFor, adminAction, comments=''):
                     GeetSai Manpower Consultancy
                     http://localhost:8000 '''
 
-    message = render_to_string('accounts/admin_response.html', {
+    message = render_to_string('emails/accounts/admin_response.html', {
                 'user': user,
                 'requestFor': requestFor,
                 'adminAction': adminAction,
@@ -565,7 +565,7 @@ def deactivate(request):
 
 def sendEmail(user, uid, token, domain):
     email_subject = 'Account Activation Link'
-    message = render_to_string('accounts/activate_account.html', {
+    message = render_to_string('emails/accounts/activate_account.html', {
                 'user': user,
                 'domain': domain,
                 'uid': uid,

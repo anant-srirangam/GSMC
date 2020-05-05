@@ -37,7 +37,8 @@ def listing(request, listing_id):
             linkUrl = reverse('index')
     context = {
         'listing': listing,
-        'linkUrl': linkUrl
+        'linkUrl': linkUrl,
+        'time':datetime.now()
     }
     return render(request, 'listings/job_listing.html', context)
 
@@ -124,42 +125,21 @@ def removedListing(request, listing_id):
 
 
 def listingAction(request, listing_id):
-    fileTypes = [
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'application/pdf'
-    ]
     if request.method == 'POST':
-        if request.POST['requestType'] == 'apply':
-            resume = request.FILES['resume']
-            if resume.content_type not in fileTypes:
-                messages.error(request, 'Invalid file type')
-                return redirect('listing',7)
-            if resume.size/1024 > 500:
-                messages.error(request, 'file too big')
-                return redirect('listing',7)
-            messages.success(request, 'Successfully applied...')
+        listing = Listing.objects.get(pk=listing_id)
+        listing.removeDate = datetime.now()
+        listing.removedBy = 'user'
+        listing.is_listed = False
+        listing.save()
 
-            listing = Listing.objects.get(pk=listing_id)
+        user = User.objects.get(pk=request.user.id)
 
-            listing.noOfApplies = listing.noOfApplies+1
-            listing.save()
-
-            return redirect('listing',listing_id)
-        elif request.POST['requestType'] == 'remove':
-            listing = Listing.objects.get(pk=listing_id)
-            listing.removeDate = datetime.now()
-            listing.removedBy = 'user'
-            listing.is_listed = False
-            listing.save()
-
-            user = User.objects.get(pk=request.user.id)
-
-            user.profile.livePosts = user.profile.livePosts-1
-            
-            user.save()
-            
-            messages.success(request, 'Listing successfully archived...')
-            return redirect(request.POST['linkUrl'])
+        user.profile.livePosts = user.profile.livePosts-1
+        
+        user.save()
+        
+        messages.success(request, 'Listing successfully archived...')
+        return redirect(request.POST['linkUrl'])
     else:
         if request.user.is_authenticated:
             return redirect('dashboard')
