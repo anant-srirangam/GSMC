@@ -155,6 +155,7 @@ def login(request):
         if user is not None:
             auth.login(request, user)
             messages.success(request, 'Logged in successfully')
+            request.session.set_expiry(0)
             return redirect('dashboard')
         else:
             messages.error(request, 'Inavlid Credentials')
@@ -210,7 +211,7 @@ def adminDashboard(request):
     if not request.user.is_authenticated or request.user.username != 'admin':
         return get_object_or_404(User, pk=0)
     
-
+    print(request.session.session_key)
     requests = User.objects.order_by('-date_joined').select_related('profile').filter(profile__action='newRequest')
     
     paginator = Paginator(requests, 2)
@@ -251,7 +252,6 @@ def adminApproved(request):
     
 
     requests = AdminActions.objects.order_by('-actionDate').filter(adminReqAction='approved', requestFor='activation')
-    print(requests.values())
     paginator = Paginator(requests, 2)
     page = request.GET.get('page')
     paged_requests = paginator.get_page(page)

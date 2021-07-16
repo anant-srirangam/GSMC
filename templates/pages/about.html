@@ -35,6 +35,8 @@
     </div>
   </section>
 
+  {% include 'partials/_alerts.html' %}
+
   <section id="about" class="py-4">
     <div class="container">
 		<div class="row">
@@ -95,7 +97,7 @@
 								</button>
 							</div>
 							<div class="modal-body">
-								<form action="#" method="POST">
+								<form action="{% url 'contact' %}" method="POST">
 									  {% csrf_token %}
 									  <div class="form-group">
 										  <label for="user_type" class="col-form-label">User Type</label>

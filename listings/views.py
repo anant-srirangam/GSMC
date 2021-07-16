@@ -7,6 +7,9 @@ from django.contrib.auth.models import User
 from datetime import datetime
 from urllib.parse import urlparse
 from .choices import *
+from gsmc.settings import MEDIA_ROOT
+import shutil
+import os
 
 def index(request):
     if request.user.is_authenticated:
@@ -47,7 +50,6 @@ def search(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
 
-    print(urlparse(request.build_absolute_uri()))
     listings = Listing.objects.order_by('-list_date').filter(is_listed=True)
     
     if 'keywords' in request.GET:
@@ -106,7 +108,7 @@ def newJob(request):
     context = {
             'min_experience': min_experience(),
             'max_experience': max_experience(),
-            'gmcsJobId': f"{request.user.id}_{company.upper()}{now.year}{now.month}{now.day}"
+            'gsmcJobId': f"{request.user.id}_{company.upper()}{now.year}{now.month}{now.day}"
         }
     return render(request, 'listings/new_job.html', context)
     
@@ -135,8 +137,10 @@ def listingAction(request, listing_id):
         user = User.objects.get(pk=request.user.id)
 
         user.profile.livePosts = user.profile.livePosts-1
-        
         user.save()
+
+        path = os.path.join(MEDIA_ROOT,'Candidate',f'listing_{listing_id}')
+        shutil.rmtree(path, ignore_errors=False, onerror=None)
         
         messages.success(request, 'Listing successfully archived...')
         return redirect(request.POST['linkUrl'])
@@ -151,7 +155,7 @@ def addJob(request):
     if request.method != 'POST':
         return get_object_or_404(User, pk=0)
 
-    gmcsJobId = request.POST['gmcsJobId']
+    gsmcJobId = request.POST['gsmcJobId']
     jobId = request.POST['JobId']
     jobTitle = request.POST['JobTitle']
     location = request.POST['Location']
@@ -168,7 +172,7 @@ def addJob(request):
 
     employer = User.objects.get(pk=request.user.id)
     listing = Listing.objects.create(employer=employer,
-                                    gmcsJobId=gmcsJobId,
+                                    gsmcJobId=gsmcJobId,
                                     jobId=jobId,
                                     jobTitle=jobTitle,
                                     location=location,
@@ -177,7 +181,7 @@ def addJob(request):
                                     salary=salary,
                                     jobDesc=jobDesc,
                                     description=description)
-    listing.gmcsJobId = f"{gmcsJobId}{listing.id}"
+    listing.gsmcJobId = f"{gsmcJobId}{listing.id}"
     listing.save()
 
     user = User.objects.get(pk=request.user.id)

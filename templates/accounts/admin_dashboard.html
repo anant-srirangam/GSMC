@@ -93,7 +93,7 @@
                                     style="background-color:#041d52; border-color:#041d52;"
                                 >New Users</button>
                             {% else %}
-                                <a href="{%url 'adminDashboard' %}">
+                                <a href="{%url 'adminDashboard' %}" style="text-decoration: none;">
                                 <button type="button" id="new" class="btn btn-admin" >New Users</button>
                                 </a>
                             {% endif %}
@@ -102,7 +102,7 @@
                                     style="background-color:#041d52; border-color:#041d52;"
                                 >De-Activations</button>
                             {% else %}
-                                <a href="{%url 'remRequestsAdminDashboard' %}">
+                                <a href="{%url 'remRequestsAdminDashboard' %}" style="text-decoration: none;">
                                 <button type="button" id="new" class="btn btn-admin" >De-Activations</button>
                                 </a>
                             {% endif %}
@@ -111,7 +111,7 @@
                                     style="background-color:#041d52; border-color:#041d52;"
                                 >Resumes</button>
                             {% else %}
-                                <a href="{%url 'adminDashboard' %}">
+                                <a href="{%url 'candidateAdminDashboard' %}"  style="text-decoration: none;">
                                 <button type="button" id="new" class="btn btn-admin" >Resumes</button>
                                 </a>
                             {% endif %}

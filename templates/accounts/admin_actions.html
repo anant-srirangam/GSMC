@@ -95,7 +95,7 @@
                                 {% else %}
                                 href="{% url 'adminRejected' %}"
                                 {% endif %}
-                                >
+                                style="text-decoration: none;">
                                 <button type="button" id="new" class="btn btn-admin" >New Users</button>
                                 </a>
                             {% endif %}
@@ -109,9 +109,18 @@
                                     {% else %}
                                     href="{% url 'remRequestsRejected' %}"
                                     {% endif %}
-                                >
+                                    style="text-decoration: none;">
                                 <button type="button" id="new" class="btn btn-admin" >De-Activations</button>
                                 </a>
+                            {% if buttonid == 3 %}
+                                <button type="button" id="new" class="btn btn-admin" 
+                                    style="background-color:#041d52; border-color:#041d52;"
+                                >Resumes</button>
+                            {% else %}
+                                <a href="{%url 'candidateAdminDashboard' %}"  style="text-decoration: none;">
+                                <button type="button" id="new" class="btn btn-admin" >Resumes</button>
+                                </a>
+                            {% endif %}
                             {% endif %}
                         </div>
                     </div>
